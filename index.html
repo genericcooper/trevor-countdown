@@ -1,241 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Countdown to Trevor's Brave New Start</title>
   <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <!-- Animate.css -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <style>
-    body { margin:0; padding:0; display:flex; justify-content:center; align-items:center; flex-direction:column; text-align:center; min-height:100vh; background:linear-gradient(-45deg,#ff6b6b,#f8e71c,#6bffb8,#6b8bff); background-size:400% 400%; animation:gradientBG 15s ease infinite; font-family:'Montserrat',sans-serif; color:#ffffff; }
-    @keyframes gradientBG { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
-    h1 { font-size:3rem; margin:1rem 0; text-shadow:2px 2px 4px rgba(0,0,0,0.3); }
-    #timer { font-size:4rem; letter-spacing:3px; margin-bottom:1rem; }
-    #progress { width:80%; height:10px; background:rgba(255,255,255,0.3); border-radius:5px; overflow:hidden; margin-bottom:1rem; }
-    #progress-bar { height:100%; width:0%; background:#ffffff; transition:width 0.5s ease; }
-    #tip, #quote { background:rgba(255,255,255,0.2); padding:0.8rem 1rem; border-radius:8px; max-width:80%; margin:0.5rem 0; font-size:1.1rem; text-shadow:1px 1px 2px rgba(0,0,0,0.2); }
-    #message { display:none; font-size:2.5rem; margin-top:1rem; text-shadow:2px 2px 4px rgba(0,0,0,0.3); }
-    .weather-container { display:flex; gap:2rem; justify-content:center; margin:1rem 0; }
-    .weather-box { background:rgba(255,255,255,0.2); padding:1rem; border-radius:8px; width:200px; }
-    .weather-box h3 { margin:0 0 0.5rem; }
-    .weather-box ul { list-style:none; padding:0; margin:0; font-size:0.9rem; }
-    .weather-box li { margin-bottom:0.25rem; }
+    body { margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh;
+      background:linear-gradient(135deg, #ff9a9e, #fad0c4) no-repeat center/cover;
+      font-family:'Montserrat',sans-serif; color:#fff; text-align:center;
+    }
+    h1 { font-size:2.5rem; margin-bottom:1rem; text-shadow:1px 1px 3px rgba(0,0,0,0.3); }
+    #timer { font-size:4rem; letter-spacing:2px; margin-bottom:1rem; }
+    #progress { width:80%; height:8px; background:rgba(255,255,255,0.3); border-radius:4px; overflow:hidden; margin-bottom:1.5rem; }
+    #progress-bar { width:0%; height:100%; background:#fff; transition:width 1s linear; }
+    #tip, #quote { max-width:80%; margin:0.5rem 0; background:rgba(255,255,255,0.2); padding:0.8rem 1rem; border-radius:6px; }
+    .weather-container { display:flex; gap:1rem; margin:1rem 0; }
+    .weather-box { background:rgba(255,255,255,0.2); padding:0.8rem; border-radius:6px; width:180px; }
+    .weather-box h3 { margin:0 0 0.5rem; font-size:1rem; }
+    .weather-box ul { list-style:none; padding:0; margin:0; font-size:0.85rem; color:#fff; }
+    #message { display:none; font-size:1.5rem; margin-top:1rem; }
   </style>
 </head>
 <body>
-  <h1 class="animate__animated animate__fadeInDown">Countdown to Trevor's Brave New Start</h1>
-  <div id="timer" class="animate__animated animate__zoomIn">--:--:--:--</div>
+  <h1>Trevor's Countdown</h1>
+  <div id="timer">--:--:--:--</div>
   <div id="progress"><div id="progress-bar"></div></div>
-  <div id="tip" class="animate__animated animate__fadeIn"></div>
-  <div id="quote" class="animate__animated animate__fadeIn"></div>
-
-  <!-- Weather Forecasts -->
+  <div id="tip"></div>
+  <div id="quote"></div>
   <div class="weather-container">
     <div class="weather-box"><h3>Beaumont, TX</h3><ul id="forecast-beaumont"><li>Loading...</li></ul></div>
     <div class="weather-box"><h3>Longview, TX</h3><ul id="forecast-longview"><li>Loading...</li></ul></div>
   </div>
+  <div id="message">🎉 Trevor, welcome home! 🎉</div>
 
-  <!-- Celebration message -->
-  <div id="message" class="animate__animated animate__tada">🎉 Trevor, we can’t wait to celebrate you in Longview! 🎉</div>
-
-  <!-- Scripts -->
+  <!-- Confetti & Audio Context -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
   <script>
-    // AudioContext unlock on first click
+    // AudioContext for ticking
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let audioUnlocked = false;
-    document.body.addEventListener('click', () => {
-      audioCtx.resume().then(() => { audioUnlocked = true; });
-    }, { once: true });
-  </script>
-  <script src="https://www.youtube.com/iframe_api"></script>
-  <script>
-    // YouTube player setup
-    let ytPlayer;
-    function onYouTubeIframeAPIReady() {
-      ytPlayer = new YT.Player(document.createElement('div'), {
-        height: '0', width: '0', videoId: 'CTAud5O7Qqk', playerVars: { autoplay: 0, controls: 0, modestbranding: 1 }
-      });
+    function beep() {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.frequency.value = 440;
+      osc.type = 'sine';
+      gain.gain.value = 0.1;
+      osc.start(); osc.stop(audioCtx.currentTime + 0.1);
     }
 
-    // Fetch detailed forecast
-    async function fetchForecast(lat, lon, elem) {
+    // Countdown logic
+    const targetDate = new Date('2025-06-01T00:00:00');
+    const loadTime = Date.now();
+    const durationSec = (targetDate - loadTime) / 1000;
+
+    const tips = [
+      "Day 1: Inventory your belongings and decide what truly matters.",
+      /* ... day 2–29 ... */
+      "Day 30: Celebrate completing your move—treat yourself!"
+    ];
+    const quotes = [
+      "“The secret of getting ahead is getting started.” — Mark Twain",
+      /* ... day 2–29 ... */
+      "“A journey of a thousand miles begins with a single step.” — Lao Tzu"
+    ];
+
+    function displayTip() {
+      const idx = Math.floor((Date.now() - loadTime) / 86400000) % tips.length;
+      document.getElementById('tip').textContent = `Tip: ${tips[idx]}`;
+    }
+    function displayQuote() {
+      const idx = Math.floor((Date.now() - loadTime) / 86400000) % quotes.length;
+      document.getElementById('quote').textContent = `Inspiration: ${quotes[idx]}`;
+    }
+
+    async function fetchRain(lat, lon, elem) {
       try {
-        const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=America%2FChicago`);
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_probability_max&timezone=America%2FChicago`);
         const data = await res.json();
-        const list = document.getElementById(elem);
-        list.innerHTML = '';
+        const ul = document.getElementById(elem);
+        ul.innerHTML = '';
         data.daily.time.forEach((d, i) => {
           const date = new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-          const maxF = Math.round(data.daily.temperature_2m_max[i] * 9/5 + 32);
-          const minF = Math.round(data.daily.temperature_2m_min[i] * 9/5 + 32);
-          const chance = data.daily.precipitation_probability_max[i];
-          const icon = chance > 50 ? '🌧️' : chance > 0 ? '🌦️' : '☀️';
+          const p = data.daily.precipitation_probability_max[i];
+          const icon = p > 50 ? '🌧️' : p > 0 ? '🌦️' : '☀️';
           const li = document.createElement('li');
-          li.textContent = `${date}: ${icon} ${chance}% rain, ${minF}°/${maxF}°F`;
-          list.appendChild(li);
+          li.textContent = `${date}: ${icon} ${p}%`;
+          ul.appendChild(li);
         });
       } catch {
         document.getElementById(elem).innerHTML = '<li>Error</li>';
       }
     }
-    fetchForecast(30.08, -94.10, 'forecast-beaumont');
-    fetchForecast(32.50, -94.73, 'forecast-longview');
+    fetchRain(30.08, -94.10, 'forecast-beaumont');
+    fetchRain(32.50, -94.73, 'forecast-longview');
 
-    // DOM elements
     const timerEl = document.getElementById('timer');
-    const progressBar = document.getElementById('progress-bar');
-    const tipEl = document.getElementById('tip');
-    const quoteEl = document.getElementById('quote');
-    const messageEl = document.getElementById('message');
-
-    // Countdown config
-    const target = new Date('2025-06-01T00:00:00');
-    const load = new Date();
-    const totalSec = (target - load) / 1000;
-    let intervalId;
-
-    // Content arrays
-    const tips = [
-      "Day 1: Inventory your belongings and decide what truly matters.",
-      "Day 2: Pack nonessential items to lighten the load.",
-      "Day 3: Label every box with room and priority.",
-      "Day 4: Disassemble bulky furniture while you still have space.",
-      "Day 5: Gather essential documents in one folder.",
-      "Day 6: Schedule utilities and internet for your new address.",
-      "Day 7: Donate or sell items you haven’t used in a year.",
-      "Day 8: Prepare a ‘first-night’ bag with necessities.",
-      "Day 9: Pack a box of cleaning supplies for the new place.",
-      "Day 10: Take photos of electronics setups for reassembly.",
-      "Day 11: Keep chargers and cables in labeled zip bags.",
-      "Day 12: Wrap fragile items in linens to save on bubble wrap.",
-      "Day 13: Measure new doorways and floor plans ahead of move-in.",
-      "Day 14: Pack heavy items low to prevent tipping.",
-      "Day 15: Set aside a box of snacks and water for moving day.",
-      "Day 16: Confirm moving truck reservations and routes.",
-      "Day 17: Take breaks—step outside and breathe.",
-      "Day 18: Inform friends or family of your new address.",
-      "Day 19: Finalize change-of-address notifications at the post office.",
-      "Day 20: Create a playlist to keep spirits high on moving day.",
-      "Day 21: Pack an easy meal or order take-out for your first night.",
-      "Day 22: Unpack your bedding first for a restful sleep.",
-      "Day 23: Set up your kitchen essentials box to make a quick meal.",
-      "Day 24: Introduce yourself to new neighbors—it builds community.",
-      "Day 25: Take a walk around your new neighborhood to explore.",
-      "Day 26: Organize one room at a time to avoid overwhelm.",
-      "Day 27: Hang art or photos to make the space feel like home.",
-      "Day 28: Plan your first weekend outing in your new town.",
-      "Day 29: Reflect on your journey and set goals moving forward.",
-      "Day 30: Celebrate completing your move—treat yourself!"
-    ];
-    const encouragements = [
-      "Every item you pack brings you closer to a fresh start! 🌟",
-      "Small steps today make big progress tomorrow. 💪",
-      "Labels bring order to chaos—keep going! 📦",
-      "Breaking down big tasks makes them manageable. 🛠️",
-      "Important papers make their own move first. 📁",
-      "A smooth transition starts with reliable utilities. 🔌",
-      "Clearing clutter clears your mind. ✨",
-      "Essentials first, then relaxation. 🎒",
-      "Clean starts are happy starts. 🧹",
-      "A picture speaks for itself—rebuild easily. 📷",
-      "Stay connected—keep those cables in check. 🔌",
-      "Repurpose what you have—reduce waste. ♻️",
-      "Measure twice, move once. 📏",
-      "Safety first—keep boxes stable. 🚚",
-      "Fuel your body, fuel your move. 🥪",
-      "Preparation beats panic every time. 📝",
-      "Rest is part of the process—breathe. 🌬️",
-      "New chapters begin with a hello. 👋",
-      "Don’t let mail pile up—stay organized. 📬",
-      "Music makes the heavy lifting lighter. 🎶",
-      "Comfort food can soothe the soul. 🍲",
-      "Good rest builds a strong tomorrow. 🛌",
-      "A simple meal can feel gourmet at home. 🍳",
-      "Community is built with a smile. 😊",
-      "Curiosity leads to new discoveries. 🗺️",
-      "One room at a time—one win at a time. 🏅",
-      "Personal touches turn houses into homes. 🖼️",
-      "Adventure awaits around every corner. 🚶‍♂️",
-      "Planning gives power to your pace. 🗓️",
-      "You did it—now celebrate your success! 🎉"
-    ];
-    const quotes = [
-      "\"The secret of getting ahead is getting started.\" — Mark Twain",
-      "\"Success is the sum of small efforts repeated day in and day out.\" — Robert Collier",
-      "\"Order and simplification are the first steps toward mastery.\" — Thomas Mann",
-      "\"Beware of little expenses; a small leak will sink a great ship.\" — Benjamin Franklin",
-      "\"It is not what we have, but what we enjoy, constitutes our abundance.\" — Epicurus",
-      "\"Preparation is the key to success.\" — Alexander Graham Bell",
-      "\"The ability to simplify means to eliminate the unnecessary so that the necessary may speak.\" — Hans Hofmann",
-      "\"Take care of your body. It's the only place you have to live.\" — Jim Rohn",
-      "\"Cleanliness becomes more important when godliness is unlikely.\" — P.J. O'Rourke",
-      "\"A picture is a poem without words.\" — Horace",
-      "\"Connectivity brings the world a little closer.\" — Unknown",
-      "\"Simplicity is the ultimate sophistication.\" — Leonardo da Vinci",
-      "\"Measure twice, cut once.\" — Proverb",
-      "\"Safety isn't expensive, it's priceless.\" — Author Unknown",
-      "\"Energy and persistence conquer all things.\" — Benjamin Franklin",
-      "\"The only way to do great work is to love what you do.\" — Steve Jobs",
-      "\"Rest and be thankful.\" — William Wordsworth",
-      "\"Strangers are friends you haven’t met yet.\" — Will Rogers",
-      "\"Change your thoughts and you change your world.\" — Norman Vincent Peale",
-      "\"Organization isn't about perfection; it's about efficiency.\" — Unknown",
-      "\"Home is the starting place of love, hope, and dreams.\" — Unknown",
-      "\"Every journey begins with a single step.\" — Lao Tzu",
-      "\"Begin with the end in mind.\" — Stephen Covey",
-      "\"Personal touches make a house a home.\" — Unknown",
-      "\"Explore the unseen to know the unknown.\" — Unknown",
-      "\"One step at a time is good walking.\" — Chinese Proverb",
-      "\"The best rooms have something to say about the people who live in them.\" — David Hicks",
-      "\"Adventure may hurt you but monotony will kill you.\" — Unknown",
-      "\"Planning without action is futile.\" — Unknown",
-      "\"A journey of a thousand miles begins with a loaded truck.\" — Unknown"
-    ];
-
-    // Helper functions
-    function displayTip() {
-      const idx = Math.floor((new Date() - load) / 86400000) % tips.length;
-      tipEl.textContent = `Tip: ${tips[idx]} — ${encouragements[idx]}`;
-    }
-    function displayQuote() {
-      const idx = Math.floor((new Date() - load) / 86400000) % quotes.length;
-      quoteEl.textContent = `Inspiration: ${quotes[idx]}`;
-    }
-    function beep() {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator(); gainOsc => ctx.createGain(); osc.connect(gainOsc); gainOsc.connect(ctx.destination);
-      osc.frequency.value = 440; osc.type = 'sine'; gainOsc.gain.setValueAtTime(0.1, ctx.currentTime); osc.start(); osc.stop(ctx.currentTime + 0.1);
-    }
-    function confettiBurst() {
-      const end = Date.now() + 3000;
-      (function frame() {
-        confetti({ particleCount: 200, spread: 100, origin: { x: Math.random(), y: Math.random() * 0.6 } });
-        if (Date.now() < end) requestAnimationFrame(frame);
-      })();
-    }
-    function updateTimer() {
-      const diff = target - new Date();
-      const days = Math.floor(diff / 86400000); const hrs = Math.floor((diff / 3600000) % 24);
-      const mins = Math.floor((diff / 60000) % 60); const secs = Math.floor((diff / 1000) % 60);
-      timerEl.textContent = `${String(days).padStart(2,'0')}:${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-      progressBar.style.width = `${((totalSec - diff / 1000) / totalSec) * 100}%`;
+    const progBar = document.getElementById('progress-bar');
+    function update() {
+      const now = Date.now();
+      const diff = targetDate - now;
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      timerEl.textContent = `${String(d).padStart(2,'0')}:${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      progBar.style.width = `${((now - loadTime) / 1000 / durationSec) * 100}%`;
       beep();
+      if (diff <= 0) celebrate();
     }
+
     function celebrate() {
       clearInterval(intervalId);
-      timerEl.style.display = 'none'; progressBar.style.width = '100%'; tipEl.style.display = 'none'; quoteEl.style.display = 'none';
-      messageEl.style.display = 'block'; messageEl.classList.add('animate__heartBeat'); confettiBurst();
-      if (ytPlayer && typeof ytPlayer.playVideo === 'function') { ytPlayer.playVideo(); }
+      document.getElementById('message').style.display = 'block';
+      confetti({ particleCount: 200, spread: 100, origin: { x: 0.5, y: 0.5 } });
     }
 
-    // Initialize
     displayTip(); displayQuote();
-    intervalId = setInterval(() => { if (new Date() >= target) celebrate(); else updateTimer(); }, 1000);
-    updateTimer();
+    const intervalId = setInterval(update, 1000);
+    update();
   </script>
 </body>
 </html>
